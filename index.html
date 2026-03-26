@@ -675,7 +675,6 @@
   // ── Combined observers ──
   const revealObs = new IntersectionObserver((entries) => {
     entries.forEach(e => {
-      console.log('reveal', e.target, e.isIntersecting);
       if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }
     });
   }, { threshold: 0 });
@@ -683,7 +682,6 @@
 
   const h1Obs = new IntersectionObserver((entries) => {
     entries.forEach(e => {
-      console.log('h1', e.target, e.isIntersecting);
       if (e.isIntersecting) { animateTypewriter(e.target); h1Obs.unobserve(e.target); }
     });
   }, { threshold: 0 });
@@ -692,16 +690,6 @@
   const cardObs = new IntersectionObserver((entries) => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('cards-visible'); cardObs.unobserve(e.target); } });
   }, { threshold: 0 });
-  document.querySelectorAll('.card-grid').forEach(el => cardObs.observe(el));
-
-  const h1Obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { animateTypewriter(e.target); h1Obs.unobserve(e.target); } });
-  }, { threshold: 0.3 });
-  document.querySelectorAll('h1.t-h1').forEach(h1 => h1Obs.observe(h1));
-
-  const cardObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('cards-visible'); cardObs.unobserve(e.target); } });
-  }, { threshold: 0.08 });
   document.querySelectorAll('.card-grid').forEach(el => cardObs.observe(el));
 
   // ── Floating CTA ──
@@ -719,4 +707,11 @@
   setTimeout(() => {
     if (!floatingOpen) {
       floatingOpen = true;
-      floatingCar
+      floatingCard.classList.add('visible');
+      floatingBtn.classList.add('active');
+      floatingBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+    }
+  }, 4000);
+</script>
+</body>
+</html>
