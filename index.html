@@ -107,11 +107,27 @@
     .card-hover:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.08); }
 
     /* ── Animations ── */
-    .reveal, .reveal-group { opacity: 1; transform: none; }
-    .reveal-group > * { opacity: 1; transform: none; }
+    .reveal { opacity: 0; transform: translateY(50px); transition: opacity 700ms cubic-bezier(0.4,0,0.2,1), transform 700ms cubic-bezier(0.4,0,0.2,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-group > * { opacity: 0; transform: translateY(50px); transition: opacity 700ms cubic-bezier(0.4,0,0.2,1), transform 700ms cubic-bezier(0.4,0,0.2,1); }
+    .reveal-group.visible > *:nth-child(1){opacity:1;transform:translateY(0);transition-delay:0ms}
+    .reveal-group.visible > *:nth-child(2){opacity:1;transform:translateY(0);transition-delay:100ms}
+    .reveal-group.visible > *:nth-child(3){opacity:1;transform:translateY(0);transition-delay:200ms}
+    .reveal-group.visible > *:nth-child(4){opacity:1;transform:translateY(0);transition-delay:300ms}
 
-    /* Card stagger — always visible */
-    .card-grid > * { opacity: 1; transform: none; }
+    /* H1 typewriter */
+    .t-h1 .tw-word { display: inline-block; overflow: hidden; vertical-align: bottom; }
+    .t-h1 .tw-char { display: inline-block; color: #D7FD82; opacity: 0; transform: translateY(8px); transition: opacity 80ms ease, transform 80ms ease, color 300ms ease; }
+    .t-h1.tw-visible .tw-char { opacity: 1; transform: translateY(0); }
+    .t-h1.tw-visible .tw-char.tw-settled { color: var(--tw-final-color, #0D0D0D); }
+    .t-h1 .highlight .tw-char { --tw-final-color: #8464FF; }
+
+    /* Card stagger */
+    .card-grid > * { opacity: 0; transform: translateY(32px); transition: opacity 600ms cubic-bezier(0.4,0,0.2,1), transform 600ms cubic-bezier(0.4,0,0.2,1); }
+    .card-grid.cards-visible > *:nth-child(1){opacity:1;transform:translateY(0);transition-delay:0ms}
+    .card-grid.cards-visible > *:nth-child(2){opacity:1;transform:translateY(0);transition-delay:100ms}
+    .card-grid.cards-visible > *:nth-child(3){opacity:1;transform:translateY(0);transition-delay:200ms}
+    .card-grid.cards-visible > *:nth-child(4){opacity:1;transform:translateY(0);transition-delay:300ms}
 
     /* ── Step videos ── */
     .step-video { border-radius: 24px; overflow: hidden; position: relative; min-height: clamp(240px, 30vw, 480px); }
@@ -658,15 +674,25 @@
 
   // ── Combined observers ──
   const revealObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
-  }, { threshold: 0.05 });
+    entries.forEach(e => {
+      console.log('reveal', e.target, e.isIntersecting);
+      if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }
+    });
+  }, { threshold: 0 });
   document.querySelectorAll('.reveal, .reveal-group').forEach(el => revealObs.observe(el));
 
-  // Fallback: if observer never fires (iframe preview), show everything after 800ms
-  setTimeout(() => {
-    document.querySelectorAll('.reveal, .reveal-group').forEach(el => el.classList.add('visible'));
-    document.querySelectorAll('.card-grid').forEach(el => el.classList.add('cards-visible'));
-  }, 800);
+  const h1Obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      console.log('h1', e.target, e.isIntersecting);
+      if (e.isIntersecting) { animateTypewriter(e.target); h1Obs.unobserve(e.target); }
+    });
+  }, { threshold: 0 });
+  document.querySelectorAll('h1.t-h1').forEach(h1 => h1Obs.observe(h1));
+
+  const cardObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('cards-visible'); cardObs.unobserve(e.target); } });
+  }, { threshold: 0 });
+  document.querySelectorAll('.card-grid').forEach(el => cardObs.observe(el));
 
   const h1Obs = new IntersectionObserver((entries) => {
     entries.forEach(e => { if (e.isIntersecting) { animateTypewriter(e.target); h1Obs.unobserve(e.target); } });
